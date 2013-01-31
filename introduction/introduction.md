@@ -1,5 +1,4 @@
 !SLIDE center
-
 # Users, SOA tools & You
 
 ![octocat](baracktocat.jpg)
@@ -7,55 +6,50 @@
 By Jon Phenow
 
 !SLIDE
-
 # Hi, I'm Jon Phenow
 
 * I'm 22
-* I like: beer, hacking long walks on the beach
-* One year at Sport Ngin
+* Beer, hacking, & long walks on the beach
+* Mostly beer
+* One year
 
 http://github.com/jphenow
 
 [@jphenow](http://twiter.com/jphenow)
 
-http://jphenow.github.com
+!SLIDE center
 
-!SLIDE
-
-![burntbeer](burnthebeer.jpg)
+![sagan1](http://media.tumblr.com/tumblr_lbn9j4z6P61qzf6rx.gif)
 
 !SLIDE bullets
-
 # Current Projects
 
+* [Foundation](http://github.com/tstmedia/foundation)
 * [User Service](http://github.com/tstmedia/user_service)
-* User tools ([Elmer](http://github.com/tstmedia/elmer))
-* Inter-service tools ([Foundation](http://github.com/tstmedia/foundation))
+* [Elmer](http://github.com/tstmedia/elmer)
 
 !SLIDE
-
 # Ngin now
 
 ![mono](monolithic.png)
 
 !SLIDE
+# The Future
 
-# Why are we talking?
+![future](http://cdn.thenextweb.com/wp-content/blogs.dir/1/files/2010/08/back-to-the-future.jpg)
 
-## The future of the ecosystem
+!SLIDE
+# The Future
 
 ![soa](soa.png)
 
 !SLIDE bullets
-
 # Why do you care?
-
 ## SOA is cool and you can't escape it.
 
 ![zergrush](zerg_rush.jpg)
 
 !SLIDE
-
 # Why do you care?
 
 * Focused Apps that do one thing well

@@ -14,6 +14,12 @@
 
 !SLIDE center
 
-![thanks](http://25.media.tumblr.com/tumblr_lna3ahy8td1qbcheyo1_500.gif)
+![deal](http://3.bp.blogspot.com/-qF8e_OjSJ_E/UAKhrLIcoEI/AAAAAAAAB5c/V_jssazB0JM/s1600/carl-sagan-deal-with-it.gif)
+
+!SLIDE center
+
+## Thanks
+
+![youreawesome](http://media.tumblr.com/tumblr_lwudxidwA61qbbi50.gif)
 
 .notes questions?

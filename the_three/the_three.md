@@ -19,9 +19,9 @@
 
 ```js
 {
-  "metadata": {..}
-  "result": {..}
-  "error": { "status": "..", messages: [..] }
+  "metadata": {..},
+  "result": {..},
+  "error": { "status": "..", "messages": [..] }
 }
 ```
 
@@ -39,8 +39,10 @@ end
 ## Controller helpers
 
 ```ruby
-metadata[:current_user] = current_user
-rescue_error status: :not_found, message: "Error!"
+def show
+  metadata[:current_user] = current_user
+  rescue_error status: :not_found, message: "Error!"
+end
 ```
 
 ```js
@@ -62,10 +64,12 @@ rescue_error status: :not_found, message: "Error!"
 ## Controller helpers
 
 ```ruby
-query_params        # => {}
-post_params         # => { :user => { id: => '1' } }
-object_params       # => { :id => '1' }
-render_action :show
+def update
+  query_params        # => {}
+  post_params         # => { :user => { id: => '1' } }
+  object_params       # => { :id => '1' }
+  render_action :show
+end
 ```
 
 ```js
@@ -78,6 +82,11 @@ render_action :show
 !SLIDE
 # Foundation
 ## Controller helpers
+
+```ruby
+post_params         # => { :user => { id: => '1' } }
+object_params       # => { :id => '1' }
+```
 
 ```ruby
 post_params         # => { :id => '1' }
@@ -117,7 +126,7 @@ end
 
 !SLIDE
 # Foundation
-## Configuration
+## Model
 
 ```ruby
 User.all
@@ -136,7 +145,7 @@ user.save
 # User Service
 
   * User Auth
-  * Ngin special treatment
+  * User specific data
   * current_user for future apps
 
 !SLIDE
@@ -144,17 +153,13 @@ user.save
 
 ![oauth2](oauth2.png)
 
-!SLIDE
-# User Service
-## Permissions
-
-![youshallnotpass](http://images.wikia.com/legomessageboards/images/2/28/You-shall-not-pass.jpeg)
+http://oauth.net/2/
 
 !SLIDE
 # User Service
 ## Permissions, Groups & Roles
 
-  * Flat
+  Flat
 
 ![plank](http://www.planking.me/wp-content/uploads/2012/11/bulldog_first_time_planking.jpg)
 
@@ -171,10 +176,16 @@ user.save
 ## Roles
 
   * Accessed via name (No IDs)
-  * Applies to one resource
-  * Says read/write/admin
-  * Says if can permission an object
+  * Specific resources
+  * read/write/admin
+  * Can permission an object?
   * No knowledge of cascading objects
+
+!SLIDE
+# User Service
+## Permissions
+
+![youshallnotpass](http://images.wikia.com/legomessageboards/images/2/28/You-shall-not-pass.jpeg)
 
 !SLIDE
 # User Service
@@ -189,7 +200,7 @@ user.save
 ## Permissions
 
   * Client-side interpretation (not a browser)
-  * Backends => Elmer (we'll get there)
+  * Services => Elmer (we'll get there)
   * Clients => 401s
 
 !SLIDE
@@ -211,10 +222,21 @@ user.save
 !SLIDE
 # Elmer
 
-  * Users!
   * Built on Foundation
-  * OAuth2 Redirect (token grant type) workflow
+  * OAuth2 Redirect
   * Access Token passing
+
+!SLIDE
+# Elmer
+## OAuth2 Redirect
+
+![redirect](redirect.jpeg)
+
+!SLIDE
+# Elmer
+# Token Passing
+
+![auth-passing](auth-passing.png)
 
 !SLIDE
 # Elmer
@@ -243,12 +265,13 @@ end
 Let's say we have a permission:
 
 ```js
-{
-  "resource_type": "Persona"
-  "resource_id": 1
-  "principal_type": "League"
-  "principal_id": 1
+[{
+  "resource_type": "Persona",
+  "resource_id": 1,
+  "principal_type": "League",
+  "principal_id": 1,
   "role": "tournament_admin"
+}]
 ```
 
 Let's say tournament admin grants direct write access to League
@@ -258,10 +281,10 @@ Let's say tournament admin grants direct write access to League
 ## Basic Permissions
 
 ```ruby
-current_user.read? League.find(1)
-current_user.write? League.find(1)
-current_user.admin? League.find(1)
-current_user.third_north?
+current_user.read? League.find(1)   # => true
+current_user.write? League.find(1)  # => true
+current_user.admin? League.find(1)  # => true
+current_user.third_north?           # => false
 ```
 
 !SLIDE
@@ -271,12 +294,13 @@ current_user.third_north?
 Let's say we still have:
 
 ```js
-{
-  "resource_type": "Persona"
-  "resource_id": 1
-  "principal_type": "League"
-  "principal_id": 1
+[{
+  "resource_type": "Persona",
+  "resource_id": 1,
+  "principal_type": "League",
+  "principal_id": 1,
   "role": "tournament_admin"
+}]
 ```
 
 !SLIDE
@@ -286,10 +310,12 @@ Let's say we still have:
 ```ruby
 class Game
   include Elmer::Permissionable
-  permissioned_to :subseason, :league
+  permissioned_to :subseason, :leagues
+
+  belongs_to :subseson
 
   def league
-    League.find(1)
+    League.find(1,2)
   end
 end
 ```
@@ -299,7 +325,7 @@ end
 ## Advanced Permissions
 
 ```ruby
-current_user.can_read? Game.find(1)
-current_user.can_write? Game.find(1)
-current_user.can_admin? Game.find(1)
+current_user.can_read? Game.find(1)   # => true
+current_user.can_write? Game.find(1)  # => true
+current_user.can_admin? Game.find(1)  # => true
 ```
