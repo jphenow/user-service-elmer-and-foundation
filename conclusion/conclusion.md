@@ -1,7 +1,6 @@
 !SLIDE bullet
 # Final thoughts
-
-* Don't ask me, its black magic
+## Don't ask me, its black magic
 
 ![magic](http://esreality.com/files/inlineimages/2012/87469-magic.gif)
 
@@ -11,6 +10,10 @@
 * Submit issues with examples & code
 * Submit pull-requests
 
+.notes Its yours, help me make it better, more flexible, work for you
+
 !SLIDE center
 
 ![thanks](http://25.media.tumblr.com/tumblr_lna3ahy8td1qbcheyo1_500.gif)
+
+.notes questions?

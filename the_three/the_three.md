@@ -1,8 +1,8 @@
 !SLIDE
 # Foundation
 
-* Naming sucks
-* So does consistency
+  * Naming sucks
+  * So does consistency
 
 !SLIDE
 # Foundation
@@ -13,25 +13,131 @@
   - metadata
   - result
 
+!SLIDE
+# Foundation
+## Common payloads between APIs
 
-CODECODECODECODECODE
+```js
+{
+  "metadata": {..}
+  "result": {..}
+  "error": { "status": "..", messages: [..] }
+}
+```
+
+!SLIDE
+# Foundation
+## Base Class
+
+```ruby
+class ApplicationController < Foundation::BaseController
+end
+```
+
+!SLIDE
+# Foundation
+## Controller helpers
+
+```ruby
+metadata[:current_user] = current_user
+rescue_error status: :not_found, message: "Error!"
+```
+
+```js
+{
+  "metadata": {
+    "current_user": {..}
+  },
+  "result": nil,
+  "error": {
+    "status": 404,
+    "messages": "Error!"
+  }
+}
+```
+.notes suppress response codes, full object support
+
+!SLIDE
+# Foundation
+## Controller helpers
+
+```ruby
+query_params        # => {}
+post_params         # => { :user => { id: => '1' } }
+object_params       # => { :id => '1' }
+render_action :show
+```
+
+```js
+{
+  "metadata": {..},
+  "result": {..}
+}
+```
+
+!SLIDE
+# Foundation
+## Controller helpers
+
+```ruby
+post_params         # => { :id => '1' }
+object_params       # => { :id => '1' }
+```
 
 !SLIDE
 # Foundation
 
-  * Base class for remote objects
   * Auto resource location
+  * Base class for remote objects
   * Open up payload envelope
   * Querying (active dev)
 
-CODECODECODECODECODE
+!SLIDE
+# Foundation
+## Configuration
+
+```ruby
+Foundation.config do |config|
+  config.set_proxy_url "http://api.ngin.com"
+end
+
+class User < Foundation::ServiceResource::Base
+  field :first_name
+
+  request_uri # => "http://user-service.ngin.com/users"
+
+  path "something_else"
+  request_uri # => "http://user-service.ngin.com/something_else"
+
+  site "http://localhost:3000"
+  request_uri # => "http://localhost:3000/something_else"
+end
+```
+.notes change environments
+
+!SLIDE
+# Foundation
+## Configuration
+
+```ruby
+User.all
+User.where(..)        # => query params
+
+user = User.new metadata: { current_user: {} }, result: { id: 1 }
+user.id               # => 1
+user.metadata         # => Metadata
+user.remote_errors    # => Errors
+user.name = "jon"
+user.save
+```
+.notes caching, lazy loading, object like arel
 
 !SLIDE
 # User Service
 
-* User Auth
-* Ngin special treatment
-* current_user for future apps
+  * User Auth
+  * Ngin special treatment
+  * current_user for future apps
 
 !SLIDE
 # User Service
@@ -46,19 +152,45 @@ CODECODECODECODECODE
 
 !SLIDE
 # User Service
-## Permissions & Groups
+## Permissions, Groups & Roles
 
-* Flat
+  * Flat
 
 ![plank](http://www.planking.me/wp-content/uploads/2012/11/bulldog_first_time_planking.jpg)
 
 !SLIDE
 # User Service
+## Groups
+
+  * Owner
+  * Many Personas
+  * Dictates membership
+
+!SLIDE
+# User Service
+## Roles
+
+  * Accessed via name (No IDs)
+  * Applies to one resource
+  * Says read/write/admin
+  * Says if can permission an object
+  * No knowledge of cascading objects
+
+!SLIDE
+# User Service
 ## Permissions
 
-* Client-side interpretation (not a browser)
-* Backends => Elmer (we'll get there)
-* Clients => 401s
+  * Principal (Persona/Group)
+  * Resource  (Thing that requires access control)
+  * Role      (For Permissions)
+
+!SLIDE
+# User Service
+## Permissions
+
+  * Client-side interpretation (not a browser)
+  * Backends => Elmer (we'll get there)
+  * Clients => 401s
 
 !SLIDE
 # Elmer
@@ -68,30 +200,106 @@ CODECODECODECODECODE
 
 !SLIDE
 # Elmer
+## Glue
+![glue](http://www.usacouponsavings.com/wp-content/uploads/2010/10/elmers_glue.jpg)
+
+!SLIDE
+# Elmer
 
 ![user](http://fc02.deviantart.net/fs71/i/2011/027/9/5/fight_for_the_user_by_nostrildarmus-d385u9h.jpg)
 
 !SLIDE
 # Elmer
 
-* Users!
-* Built on Foundation
-* OAuth2 Redirect (token grant type) workflow
-* Access Token passing
+  * Users!
+  * Built on Foundation
+  * OAuth2 Redirect (token grant type) workflow
+  * Access Token passing
 
-CODECODECODECODECODECODECODE
+!SLIDE
+# Elmer
+```ruby
+Elmer.config do |config|
+  config.client_id = "f26a66b69ddd4bd1ad6814f873e1468d"
+  config.client_secret = "7e3295548bcdb7108eea63cd9371df75"
+
+  config.ngin_token_grant_type = true
+  config.ngin_passthrough = true
+
+  config.foundation do |c|
+    c.set_proxy_url "http://api.ngin.com"
+  end
+end
+```
 
 !SLIDE
 # Elmer
 
-* Permission checks
-* DSL for defining cascading
-
-CODECODECODECODECODECODECODE
+  * Permission checks
+  * DSL for defining cascading
 
 !SLIDE
 # Elmer
+Let's say we have a permission:
 
-* Groups
+```js
+{
+  "resource_type": "Persona"
+  "resource_id": 1
+  "principal_type": "League"
+  "principal_id": 1
+  "role": "tournament_admin"
+```
 
-CODECODECODECODECODECODECODE
+Let's say tournament admin grants direct write access to League
+
+!SLIDE
+# Elmer
+## Basic Permissions
+
+```ruby
+current_user.read? League.find(1)
+current_user.write? League.find(1)
+current_user.admin? League.find(1)
+current_user.third_north?
+```
+
+!SLIDE
+# Elmer
+## Advanced Permissions
+
+Let's say we still have:
+
+```js
+{
+  "resource_type": "Persona"
+  "resource_id": 1
+  "principal_type": "League"
+  "principal_id": 1
+  "role": "tournament_admin"
+```
+
+!SLIDE
+# Elmer
+## Advanced Permissions
+
+```ruby
+class Game
+  include Elmer::Permissionable
+  permissioned_to :subseason, :league
+
+  def league
+    League.find(1)
+  end
+end
+```
+
+!SLIDE
+# Elmer
+## Advanced Permissions
+
+```ruby
+current_user.can_read? Game.find(1)
+current_user.can_write? Game.find(1)
+current_user.can_admin? Game.find(1)
+```
